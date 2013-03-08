@@ -1,0 +1,46 @@
+# This should be used after vm is installed
+# A vm should provide a default Benchfile
+#
+# We should have a toobelt cli method that initializes a benchfile
+# something like `devbench init devbench/ubuntu-precise-rails`
+# or `devbench init https://devbench.io/devbench/ubuntu-precise-rails`
+#   1. Downloads vm if doesn't exist locally
+#   2. Sets up default Benchfile in current directory
+
+# Updating vm
+# `devbench update`
+#   1. Displays any backwards incompatible changes
+#   2. Downloads new vm
+#   3. Displays new options
+
+
+launch 'devbench/ubuntu-precise-rails'
+launch 'devbench/ubuntu-precise-rails', :ec2
+launch 'devbench/ubuntu-precise-rails', :devbench
+
+# Benchfile should provide configuration details for what
+# jobs/services to run
+startup do
+  rbenv do
+    version '2.0.0-p0'
+  end
+  run :mysql do
+    host 'localhost'
+  end
+  start :rails
+end
+
+# And build details?
+build do
+  # All these commands get run in VM?
+
+  # Do we need to support a build directory?
+  app_dir '/devbench-web' # Where to symlink to
+  jshint
+  bundle
+  restart rails server
+  start_tunnel # Can we support force ssl in development
+end
+
+
+#How to handle version control?
