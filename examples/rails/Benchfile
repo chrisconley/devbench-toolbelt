@@ -10,7 +10,8 @@
 
 # need a way for main user account to create encrypted files/probably from command line?
 # They will have to have a local settings file, then
-# `devbench settings create chrisconley --public-key ~/Downloads/chris.pub --settings ~/.settings.json`
+# `devbench settings create joedirt --settings ~/.settings.json`
+#   * This will download the public key that joedirt uploaded when creating his account so the file can be encrypted
 # If this creates a file in s3, we're going to need to create a temporary federated user
 # so the file can be uploaded
 
@@ -21,6 +22,12 @@
 #   2. Downloads new vm
 #   3. Displays new options
 
+# Starting the VM
+# `devbench start`
+#   * Launch the VM if is not already running
+#   * Run Configuration/startup
+#   * Run Build
+
 
 launch 'devbench/ubuntu-precise-rails'
 launch 'devbench/ubuntu-precise-rails', :ec2 # ec2/devbench options should be on command line
@@ -29,19 +36,26 @@ launch 'devbench/ubuntu-precise-rails', :devbench
 # Benchfile should provide configuration details for what
 # jobs/services to run
 startup do
-  rbenv do
-    version '2.0.0-p0'
-  end
+  #rbenv do # This could actually go in build, so multiple rubies can be support for each project
+    #version '2.0.0-p0'
+  #end
+  # eff the dsl for simple things
+  shell 'rbenv global 2.0.0-p0'
+
   run :mysql do
     host 'localhost'
   end
-  start :rails
+
+  # Need a way to set environment variables?
+  env 'MONGOHQ_URL', devbench[:mongo_url]
 end
 
 # And build details?
-# Or should this go in a Buildfile?
+# Or should this go in a Buildfile? or just a Rakefile? Maybe we don't even need this 
+# right now?
 build do
   # All these commands get run in VM?
+  # Maybe the watcher can even be run in the VM? Which automatically gets run when starting
 
   # Do we need to support a build directory?
   app_dir '/devbench-web' # Where to symlink/rsync to
